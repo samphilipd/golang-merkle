@@ -4,12 +4,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io"
 	"os"
 )
 
 const (
-	path           = "alice.txt"
+	path           = "alice_trunc.txt"
 	chunkSizeBytes = 1024
 )
 
@@ -33,30 +32,36 @@ func filePath2RootNode(path string) Node {
 		panic("Cannot open file")
 	}
 
-	// fileInfo, _ := os.Stat(path)
-	// size := fileInfo.Size()
-	// fmt.Pri
+	fileInfo, _ := os.Stat(path)
+	nChunks := nChunks(fileInfo)
 
-	leafNodes := make([]Node, 0)
+	leafNodes := make([]Node, nChunks)
+	buffer := make([]byte, chunkSizeBytes)
 
-	for {
-		buffer := make([]byte, chunkSizeBytes)
+	for i := 0; i < nChunks; i++ {
 		length, err := f.Read(buffer)
-		if err == io.EOF {
-			break
+		if err != nil {
+			panic("Unexpected error reading file")
 		}
-		// fmt.Println(buffer)
-		// fmt.Printf("%d bytes\n", length)
 		node := makeLeafNode(buffer[:length])
-		leafNodes = append(leafNodes, node)
+		leafNodes[i] = node
 	}
 
 	return rootNode(leafNodes)
 }
 
+func nChunks(fileInfo os.FileInfo) int {
+	size := fileInfo.Size()
+	nChunks := int(size / chunkSizeBytes)
+	if size%chunkSizeBytes != 0 {
+		nChunks++
+	}
+	return nChunks
+
+}
+
 func makeLeafNode(bytes []byte) Node {
 	hash := hash(bytes)
-	// fmt.Println(hex.EncodeToString(hash[:]))
 	return Node{
 		hash,
 		nil,
@@ -69,7 +74,6 @@ func rootNode(nodes []Node) Node {
 }
 
 func buildTree(nodes []Node) []Node {
-	// fmt.Println(len(nodes))
 	if len(nodes) == 1 {
 		// The root node
 		return nodes

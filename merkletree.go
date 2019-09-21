@@ -23,12 +23,20 @@ type Node struct {
 }
 
 func main() {
+	rootNode := filePath2RootNode(path)
+	fmt.Println(hex.EncodeToString(rootNode.value[:]))
+}
+
+func filePath2RootNode(path string) Node {
 	f, err := os.Open(path)
 	if err != nil {
 		panic("Cannot open file")
 	}
 
-	// TODO: Make the slice have size the length of the file
+	// fileInfo, _ := os.Stat(path)
+	// size := fileInfo.Size()
+	// fmt.Pri
+
 	leafNodes := make([]Node, 0)
 
 	for {
@@ -43,8 +51,7 @@ func main() {
 		leafNodes = append(leafNodes, node)
 	}
 
-	rootNode := rootNode(leafNodes)
-	fmt.Println(hex.EncodeToString(rootNode.value[:]))
+	return rootNode(leafNodes)
 }
 
 func makeLeafNode(bytes []byte) Node {
@@ -93,10 +100,5 @@ func makeParent(left, right Node) Node {
 }
 
 func hash(block []byte) [sha256.Size]byte {
-	hash := sha256.Sum256(block)
-	return hash
-}
-
-func printValue(node Node) {
-	fmt.Println(node.value)
+	return sha256.Sum256(block)
 }

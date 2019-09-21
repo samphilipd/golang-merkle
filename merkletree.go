@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	path           = "alice.txt"
+	// Path to the file for which we want to get the Merkle root
+	Path           = "alice.txt"
 	chunkSizeBytes = 1024
 )
 
@@ -30,7 +31,7 @@ func main() {
 		panic("Only 0 or 1 argument is allowed")
 	}
 
-	rootNode := filePath2RootNode(path)
+	rootNode := filePath2RootNode(Path)
 
 	node := lookup(rootNode, lookupRoute)
 

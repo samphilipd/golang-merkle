@@ -12,6 +12,13 @@ const (
 	Path = "alice.txt"
 	// ChunkSize is chunk size in bytes
 	ChunkSize = 1024
+	helpMsg   = `
+Return the Merkle root of the file alice.txt.
+
+usage: go run merkletree.go [route]
+
+Route may be provided e.g. 00000101 (0 being left, 1 being right).
+`
 )
 
 // Node is a merkle tree node
@@ -29,7 +36,7 @@ func main() {
 	if len(os.Args) == 2 {
 		lookupRoute = os.Args[1]
 	} else if len(os.Args) != 1 {
-		panic("Only 0 or 1 argument is allowed")
+		panic(helpMsg)
 	}
 
 	rootNode := filePath2RootNode(Path)
@@ -45,14 +52,14 @@ func lookup(rootNode Node, route string) Node {
 	for i := 0; i < len(route); i++ {
 		if node.left == nil {
 			depth := depth(rootNode)
-			panic(fmt.Sprintf("You tried to lookup %v nodes deep, the max depth of this tree is %v", len(route), depth))
+			panic(fmt.Sprintf("Tree depth exceeded.\nYou tried to lookup %v nodes deep, the max depth of this tree is %v", len(route), depth))
 		}
 		if route[i] == '0' {
 			node = *node.left
 		} else if route[i] == '1' {
 			node = *node.right
 		} else {
-			panic("Only 0 or 1 is allowed in routes")
+			panic(fmt.Sprintf("Invalid character in route: %c. Only 0 or 1 is allowed.", route[i]))
 		}
 	}
 	return node

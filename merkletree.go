@@ -22,8 +22,32 @@ type Node struct {
 }
 
 func main() {
+	var lookupRoute string
+
+	if len(os.Args) == 2 {
+		lookupRoute = os.Args[1]
+	} else if len(os.Args) != 1 {
+		panic("Only 0 or 1 argument is allowed")
+	}
+
 	rootNode := filePath2RootNode(path)
-	fmt.Println(hex.EncodeToString(rootNode.value[:]))
+
+	node := lookup(rootNode, lookupRoute)
+
+	fmt.Println(hex.EncodeToString(node.value[:]))
+}
+
+func lookup(node Node, route string) Node {
+	for i := 0; i < len(route); i++ {
+		if route[i] == '0' {
+			node = *node.left
+		} else if route[i] == '1' {
+			node = *node.right
+		} else {
+			panic("Only 0 or 1 is allowed in routes")
+		}
+	}
+	return node
 }
 
 func filePath2RootNode(path string) Node {

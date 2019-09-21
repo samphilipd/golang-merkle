@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	// Path to the file for which we want to get the Merkle root
-	Path           = "alice.txt"
-	chunkSizeBytes = 1024
+	// Path is path to the file for which we want to get the Merkle root
+	Path = "alice.txt"
+	// ChunkSize is chunk size in bytes
+	ChunkSize = 1024
 )
 
 // Node is a merkle tree node
@@ -71,21 +72,21 @@ func dive(node Node, currentDepth int) int {
 func filePath2RootNode(path string) Node {
 	f, err := os.Open(path)
 	if err != nil {
-		panic("Cannot open file")
+		panic(err)
 	}
 
-	fileInfo, _ := os.Stat(path)
+	fileInfo, _ := f.Stat()
 	nChunks := nChunks(fileInfo)
 
 	leafNodes := make([]Node, nChunks)
-	buffer := make([]byte, chunkSizeBytes)
+	buffer := make([]byte, ChunkSize)
 
 	for i := 0; i < nChunks; i++ {
 		length, err := f.Read(buffer)
 		if err != nil {
-			panic("Unexpected error reading file")
+			panic(err)
 		}
-		node := makeLeafNode(buffer[:length])
+		node := makeLeaf(buffer[:length])
 		leafNodes[i] = node
 	}
 
@@ -94,15 +95,15 @@ func filePath2RootNode(path string) Node {
 
 func nChunks(fileInfo os.FileInfo) int {
 	size := fileInfo.Size()
-	nChunks := int(size / chunkSizeBytes)
-	if size%chunkSizeBytes != 0 {
+	nChunks := int(size / ChunkSize)
+	if size%ChunkSize != 0 {
 		nChunks++
 	}
 	return nChunks
 
 }
 
-func makeLeafNode(bytes []byte) Node {
+func makeLeaf(bytes []byte) Node {
 	hash := hash(bytes)
 	return Node{
 		hash,
@@ -117,7 +118,7 @@ func rootNode(nodes []Node) Node {
 
 func buildTree(nodes []Node) []Node {
 	if len(nodes) == 1 {
-		// The root node
+		// We always eventually return an array with one node in it - the root node
 		return nodes
 	}
 	if len(nodes)%2 == 1 {

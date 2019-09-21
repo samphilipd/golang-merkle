@@ -6,13 +6,13 @@ Get the Merkle root of the file at ./alice.txt.
 
 Get merkle root of the file:
 
-```bash
+```
 go run merkletree.go
 ```
 
 Print the hash of a node found at a particular route (0 means left, 1 means right):
 
-```bash
+```
 go run merkletree.go 00000101
 ```
 
@@ -20,6 +20,6 @@ NOTE: If, when forming a row in the tree (other than the root of the tree), it w
 
 ## Run the tests
 
-```bash
+```
 go test -v
 ```

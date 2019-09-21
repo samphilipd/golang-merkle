@@ -37,8 +37,14 @@ func main() {
 	fmt.Println(hex.EncodeToString(node.value[:]))
 }
 
-func lookup(node Node, route string) Node {
+func lookup(rootNode Node, route string) Node {
+	node := rootNode
+
 	for i := 0; i < len(route); i++ {
+		if node.left == nil {
+			depth := depth(rootNode)
+			panic(fmt.Sprintf("You tried to lookup %v nodes deep, the max depth of this tree is %v", len(route), depth))
+		}
 		if route[i] == '0' {
 			node = *node.left
 		} else if route[i] == '1' {
@@ -48,6 +54,17 @@ func lookup(node Node, route string) Node {
 		}
 	}
 	return node
+}
+
+func depth(node Node) int {
+	return dive(node, 0)
+}
+
+func dive(node Node, currentDepth int) int {
+	if node.left != nil {
+		return dive(*node.left, currentDepth+1)
+	}
+	return currentDepth
 }
 
 func filePath2RootNode(path string) Node {

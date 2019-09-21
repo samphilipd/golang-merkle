@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	path           = "alice_trunc.txt"
+	path           = "alice.txt"
 	chunkSizeBytes = 1024
 )
 

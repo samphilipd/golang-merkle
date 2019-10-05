@@ -3,22 +3,16 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"flag"
 	"fmt"
 	"os"
 )
 
 const (
-	// Path is path to the file for which we want to get the Merkle root
+	// Path is the default file for which we want to get the Merkle root
 	Path = "alice.txt"
 	// ChunkSize is chunk size in bytes
 	ChunkSize = 1024
-	helpMsg   = `
-Return the Merkle root of the file alice.txt.
-
-usage: go run merkletree.go [route]
-
-Route may be provided e.g. 00000101 (0 being left, 1 being right).
-`
 )
 
 // Node is a merkle tree node
@@ -31,15 +25,15 @@ type Node struct {
 }
 
 func main() {
+	var filePath string
 	var lookupRoute string
 
-	if len(os.Args) == 2 {
-		lookupRoute = os.Args[1]
-	} else if len(os.Args) != 1 {
-		panic(helpMsg)
-	}
+	flag.StringVar(&filePath, "file", Path, "path to file")
+	flag.StringVar(&lookupRoute, "route", "", "route of node to return e.g. \"00000101\" (0 being left, 1 being right). Default is \"\" AKA root node")
 
-	rootNode := filePath2RootNode(Path)
+	flag.Parse()
+
+	rootNode := filePath2RootNode(filePath)
 
 	node := lookup(rootNode, lookupRoute)
 
